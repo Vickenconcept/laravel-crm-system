@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Providers;
-
-// use Illuminate\Support\Facades\Gate;
+use App\Models\User;
+use App\Models\Project;
+use App\Models\Client;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -21,6 +23,30 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+
+        Gate::before(function($user, $ability) {
+            if ($user->is_admin == 1) {
+                return true;
+            }
+        });
+        // gate for project
+        Gate::define('update-project', function (User $user, Project $project) {
+            return $user->id === $project->user_id;
+        });
+        Gate::define('delete-project', function (User $user, Project $project) {
+            return $user->id === $project->user_id;
+        });
+        // gate for client
+        Gate::define('update-client', function (User $user, Client $client) {
+            return $user->id === $client->user_id;
+        });
+        Gate::define('delete-client', function (User $user, Client $client) {
+            return $user->id === $client->user_id;
+        });
+        // gate for user
+        Gate::define('delete-user', function (User $user){
+            return $user->is_admin === 1;
+        });
+
     }
 }
